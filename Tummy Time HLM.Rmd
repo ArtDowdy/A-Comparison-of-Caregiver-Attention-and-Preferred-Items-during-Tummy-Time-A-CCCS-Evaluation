@@ -1,0 +1,419 @@
+---
+title: "Tummy Time"
+author: "Blind for Review"
+date: "`r Sys.Date()`"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+# Full Model
+
+```{r Full Model}
+
+require(tidyverse)
+require(nlme)
+require(scdhlm)
+require(readxl)
+
+df <- read_xlsx("tummy_df.xlsx", col_names = TRUE)
+dim(df)
+colnames(df)
+names(df)
+
+#Estimate a hierarchical linear model for head elevation and preferred item 
+
+HEP_df <- df %>%
+          filter(dependent_variable == "head elevation") %>%
+          filter(phase_name == "baseline" | phase_name == "preferred item")
+
+HEP_hlm <- lme(outcome ~ condition, 
+                   random = ~ 1 | participant, 
+                   correlation = corAR1(0, ~ observation | participant), 
+                   data = HEP_df)
+summary(HEP_hlm)
+
+HEP_es <- g_mlm(HEP_hlm, p_const = c(0,1), r_const = c(1,0,1))
+summary(HEP_es)
+
+CI_HEP <- CI_g(HEP_es, symmetric = FALSE)
+summary(CI_HEP)
+
+#Estimate a hierarchical linear model for head elevation and attention
+
+HEA_df <- df %>%
+          filter(dependent_variable == "head elevation") %>%
+          filter(phase_name == "baseline" | phase_name == "attention") 
+
+HEA_hlm <- lme(outcome ~ condition, 
+                   random = ~ 1 | participant, 
+                   correlation = corAR1(0, ~ observation | participant), 
+                   data = HEA_df)
+summary(HEA_hlm)
+
+HEA_es <- g_mlm(HEA_hlm, p_const = c(0,1), r_const = c(1,0,1))
+summary(HEA_es)
+
+CI_HEA <- CI_g(HEA_es, symmetric = FALSE)
+summary(CI_HEA)
+
+#Estimate a hierarchical linear model for negative vocalization and preferred item
+
+NPI_df <- df %>%
+          filter(dependent_variable == "negative vocalization") %>%
+          filter(phase_name == "baseline" | phase_name == "preferred item") 
+
+NPI_hlm <- lme(outcome ~ condition, 
+                   random = ~ 1 | participant, 
+                   correlation = corAR1(0, ~ observation | participant), 
+                   data = NPI_df)
+summary(NPI_hlm)
+
+NPI_es <- g_mlm(NPI_hlm, p_const = c(0,1), r_const = c(1,0,1), infotype = "expected")
+summary(NPI_es)
+
+CI_NPI <- CI_g(NPI_es, symmetric = FALSE)
+summary(CI_NPI)
+
+#Estimate a hierarchical linear model for negative vocalization and attention
+
+NA_df <- df %>%
+          filter(dependent_variable == "negative vocalization") %>%
+          filter(phase_name == "baseline" | phase_name == "attention") 
+
+NA_hlm <- lme(outcome ~ condition, 
+                   random = ~ 1 | participant, 
+                   correlation = corAR1(0, ~ observation | participant), 
+                   data = NA_df)
+summary(NA_hlm)
+
+NA_es <- g_mlm(NA_hlm, p_const = c(0,1), r_const = c(1,0,1), infotype = "expected")
+summary(NA_es)
+
+CI_NA <- CI_g(NA_es, symmetric = FALSE)
+summary(CI_NA)
+
+```
+
+# In-Person Model
+
+```{r In-Person Model}
+
+# Format Type: In-Person. Estimate a hierarchical linear model for head elevation and preferred item 
+
+HEP_IP_df <- df %>%
+          filter(dependent_variable == "head elevation") %>%
+          filter(phase_name == "baseline" | phase_name == "preferred item") %>%
+          filter(format == "in person")
+
+HEP_IP_df_hlm <- lme(outcome ~ condition, 
+                   random = ~ 1 | participant, 
+                   correlation = corAR1(0, ~ observation | participant), 
+                   data = HEP_IP_df)
+
+summary(HEP_IP_df_hlm)
+
+HEP_IP_es <- g_mlm(HEP_IP_df_hlm, p_const = c(0,1), r_const = c(1,0,1))
+summary(HEP_es)
+
+CI_HEP_IP <- CI_g(HEP_IP_es, symmetric = FALSE)
+summary(CI_HEP_IP)
+
+# Format Type: In-Person. Estimate a hierarchical linear model for head elevation and attention
+
+HEA_IP_df <- df %>%
+          filter(dependent_variable == "head elevation") %>%
+          filter(phase_name == "baseline" | phase_name == "attention") %>%
+          filter(format == "in person")
+
+HEA_IP_hlm <- lme(outcome ~ condition, 
+                   random = ~ 1 | participant, 
+                   correlation = corAR1(0, ~ observation | participant), 
+                   data = HEA_IP_df)
+summary(HEA_IP_hlm)
+
+HEA_IP_es <- g_mlm(HEA_IP_hlm, p_const = c(0,1), r_const = c(1,0,1))
+summary(HEA_es)
+
+CI_HEA_IP <- CI_g(HEA_IP_es, symmetric = FALSE)
+summary(CI_HEA_IP)
+
+# Format Type: In-Person. Estimate a hierarchical linear model for negative vocalization and preferred item
+
+NPI_IP_df <- df %>%
+          filter(dependent_variable == "negative vocalization") %>%
+          filter(phase_name == "baseline" | phase_name == "preferred item") %>%
+          filter(format == "in person")
+
+NPI_IP_hlm <- lme(outcome ~ condition, 
+                   random = ~ 1 | participant, 
+                   correlation = corAR1(0, ~ observation | participant), 
+                   data = NPI_IP_df)
+summary(NPI_IP_hlm)
+
+NPI_IP_es <- g_mlm(NPI_IP_hlm, p_const = c(0,1), r_const = c(1,0,1))
+summary(NPI_IP_es)
+
+CI_IP_NPI <- CI_g(NPI_IP_es, symmetric = FALSE)
+summary(CI_IP_NPI)
+
+# Format Type: In-Person. Estimate a hierarchical linear model for negative vocalization and attention
+
+NA_IP_df <- df %>%
+          filter(dependent_variable == "negative vocalization") %>%
+          filter(phase_name == "baseline" | phase_name == "attention") %>%
+          filter(format == "in person")
+
+NA_IP_hlm <- lme(outcome ~ condition, 
+                   random = ~ 1 | participant, 
+                   correlation = corAR1(0, ~ observation | participant), 
+                   data = NA_IP_df)
+summary(NA_IP_hlm)
+
+NA_IP_es <- g_mlm(NA_IP_hlm, p_const = c(0,1), r_const = c(1,0,1), infotype = "expected")
+summary(NA_IP_es)
+
+CI_IP_NA <- CI_g(NA_IP_es, symmetric = FALSE)
+summary(CI_IP_NA)
+
+```
+# Remote Model
+
+```{r Remote Model}
+
+# Format Type: Remote. Estimate a hierarchical linear model for head elevation and preferred item 
+
+HEP_R_df <- df %>%
+          filter(dependent_variable == "head elevation") %>%
+          filter(phase_name == "baseline" | phase_name == "preferred item") %>%
+          filter(format == "remote")
+
+HEP_R_hlm <- lme(outcome ~ condition, 
+                   random = ~ 1 | participant, 
+                   correlation = corAR1(0, ~ observation | participant), 
+                   data = HEP_R_df)
+
+summary(HEP_R_hlm)
+
+HEP_R_es <- g_mlm(HEP_R_hlm, p_const = c(0,1), r_const = c(1,0,1))
+summary(HEP_R_es)
+
+HEP_R_ci <- CI_g(HEP_R_es, symmetric = FALSE)
+summary(HEP_R_ci)
+
+# Format Type: Remote. Estimate a hierarchical linear model for head elevation and attention
+
+HEA_R_df <- df %>%
+          filter(dependent_variable == "head elevation") %>%
+          filter(phase_name == "baseline" | phase_name == "attention") %>%
+          filter(format == "remote")
+
+HEA_R_hlm <- lme(outcome ~ condition, 
+                   random = ~ 1 | participant, 
+                   correlation = corAR1(0, ~ observation | participant), 
+                   data = HEA_R_df)
+summary(HEA_R_hlm)
+
+HEA_R_es <- g_mlm(HEA_R_hlm, p_const = c(0,1), r_const = c(1,0,1))
+summary(HEA_R_es)
+
+HEA_R_ci <- CI_g(HEA_R_es, symmetric = FALSE)
+summary(HEA_R_ci)
+
+# Format Type: Remote. Estimate a hierarchical linear model for negative vocalization and preferred item
+
+NPI_R_df <- df %>%
+          filter(dependent_variable == "negative vocalization") %>%
+          filter(phase_name == "baseline" | phase_name == "preferred item") %>%
+          filter(format == "remote")
+
+NPI_R_hlm <- lme(outcome ~ condition, 
+                   random = ~ 1 | participant, 
+                   correlation = corAR1(0, ~ observation | participant), 
+                   data = NPI_R_df)
+summary(NPI_R_hlm)
+
+NPI_R_es <- g_mlm(NPI_R_hlm, p_const = c(0,1), r_const = c(1,0,1))
+summary(NPI_R_es)
+
+CI_R_NPI <- CI_g(NPI_R_es, symmetric = FALSE)
+summary(CI_R_NPI)
+
+# Format Type: Remote. Estimate a hierarchical linear model for negative vocalization and attention
+
+NA_R_df <- df %>%
+          filter(dependent_variable == "negative vocalization") %>%
+          filter(phase_name == "baseline" | phase_name == "attention") %>%
+          filter(format == "remote")
+
+NA_R_hlm <- lme(outcome ~ condition, 
+                   random = ~ 1 | participant, 
+                   correlation = corAR1(0, ~ observation | participant), 
+                   data = NA_R_df)
+summary(NA_R_hlm)
+
+NA_R_es <- g_mlm(NA_R_hlm, p_const = c(0,1), r_const = c(1,0,1), infotype = "expected")
+summary(NA_R_es)
+
+CI_R_NA <- CI_g(NA_R_es, symmetric = FALSE)
+summary(CI_R_NA)
+
+
+
+```
+
+
+
+```{r}
+
+#Kruskal-Wallis Test to detect differences between preferred item condition and the caregiver attention condition for negative vocalization and head elevation
+
+library("ggpubr")
+library("dplyr")
+
+#Negative Vocalization 
+
+df1 <- df %>%
+  filter(dependent_variable == "negative vocalization") %>%
+  select(phase_name, outcome) %>%
+    group_by(phase_name) %>%
+      summarise(
+        count = n(),
+        mean = mean(outcome, na.rm = TRUE),
+        sd = sd(outcome, na.rm = TRUE),
+        median = median(outcome, na.rm = TRUE),
+        IQR = IQR(outcome, na.rm = TRUE)
+  )
+
+df1
+
+dfn <- df %>%
+      filter(dependent_variable == "negative vocalization")    
+
+  ggboxplot(dfn, x = "phase_name", y = "outcome", 
+          color = "phase_name", palette = c("#00AFBB", "#E7B800", "#FC4E07"),
+          order = c("baseline", "attention", "preferred item"),
+          ylab = "Outcome", xlab = "Condition")
+  
+  ggline(dfn, x = "phase_name", y = "outcome", 
+       add = c("mean_se", "jitter"), 
+       order = c("baseline", "attention", "preferred item"),
+       ylab = "Outcome", xlab = "Condition")
+  
+kruskal.test(outcome ~ phase_name, data = dfn)
+
+pairwise.wilcox.test(dfn$outcome, dfn$phase_name,
+                 p.adjust.method = "BH")
+
+#Head Elevation
+
+df2 <- df %>%
+  filter(dependent_variable == "head elevation") %>%
+  select(phase_name, outcome) %>%
+    group_by(phase_name) %>%
+      summarise(
+        count = n(),
+        mean = mean(outcome, na.rm = TRUE),
+        sd = sd(outcome, na.rm = TRUE),
+        median = median(outcome, na.rm = TRUE),
+        IQR = IQR(outcome, na.rm = TRUE)
+  )
+
+df2
+
+dfh <- df %>%
+      filter(dependent_variable == "head elevation")    
+
+  ggboxplot(dfh, x = "phase_name", y = "outcome", 
+          color = "phase_name", palette = c("#00AFBB", "#E7B800", "#FC4E07"),
+          order = c("baseline", "attention", "preferred item"),
+          ylab = "Outcome", xlab = "Condition")
+  
+  ggline(dfh, x = "phase_name", y = "outcome", 
+       add = c("mean_se", "jitter"), 
+       order = c("baseline", "attention", "preferred item"),
+       ylab = "Outcome", xlab = "Condition")
+  
+kruskal.test(outcome ~ phase_name, data = dfh)
+
+pairwise.wilcox.test(dfh$outcome, dfh$phase_name,
+                 p.adjust.method = "BH")
+
+```
+
+
+
+```{r}
+
+#Kruskal-Wallis Test to detect differences between telehealth and in-person condition and the caregiver attention condition.
+
+library("ggpubr")
+library("dplyr")
+
+# Negative Vocalization
+
+df3 <- df %>%
+  filter(dependent_variable == "negative vocalization") %>%
+  select(condition, format, outcome) %>%
+    group_by(condition,format) %>%
+      summarise(
+        count = n(),
+        mean = mean(outcome, na.rm = TRUE),
+        sd = sd(outcome, na.rm = TRUE),
+        median = median(outcome, na.rm = TRUE),
+        IQR = IQR(outcome, na.rm = TRUE)
+  )
+
+df3
+
+dfr <- df %>%
+      filter(dependent_variable == "negative vocalization") %>%
+      filter(condition == "B")
+
+  ggboxplot(dfr, x = "format", y = "outcome", 
+          color = "format", palette = c("#00AFBB", "#E7B800"),
+          order = c("remote", "in person"),
+          ylab = "Outcome", xlab = "Format")      
+  
+  ggline(dfr, x = "format", y = "outcome", 
+       add = c("mean_se", "jitter"), 
+       order = c("remote", "in person"),
+       ylab = "Outcome", xlab = "Format")
+  
+kruskal.test(outcome ~ format, data = dfr)
+
+#Head Elevation
+
+df4 <- df %>%
+  filter(dependent_variable == "head elevation") %>%
+  select(condition, format, outcome) %>%
+    group_by(condition,format) %>%
+      summarise(
+        count = n(),
+        mean = mean(outcome, na.rm = TRUE),
+        sd = sd(outcome, na.rm = TRUE),
+        median = median(outcome, na.rm = TRUE),
+        IQR = IQR(outcome, na.rm = TRUE)
+  )
+
+df4
+
+dfi <- df %>%
+      filter(dependent_variable == "head elevation") %>%
+      filter(condition == "B")
+
+  ggboxplot(dfi, x = "format", y = "outcome", 
+          color = "format", palette = c("#00AFBB", "#E7B800"),
+          order = c("remote", "in person"),
+          ylab = "Outcome", xlab = "Format")      
+  
+  ggline(dfi, x = "format", y = "outcome", 
+       add = c("mean_se", "jitter"), 
+       order = c("remote", "in person"),
+       ylab = "Outcome", xlab = "Format")
+  
+kruskal.test(outcome ~ format, data = dfi)
+
+
+```
+
